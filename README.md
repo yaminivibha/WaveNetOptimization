@@ -7,7 +7,7 @@ IEEE report available here
 
 #### Yamini Ananth yva2002, Stan Liao
 
-## Setup
+## Environment Setup
 
 Create a Linux VM on GCP with the following specifications:
 - N1-highmem2 (13GB)
@@ -25,10 +25,11 @@ $ bash setup.sh
 ```
 
 ## Setting up Wavenet with AIHWToolkit
-- updated to use inputs.squeeze() in queue.enqueue function
-- changed from deprecated librosa to modern soundfile.write(soundrate=16000)
+- updated to use inputs.squeeze() in queue.enqueue function in `wavenet_model.py` as described [here](https://github.com/vincentherrmann/pytorch-wavenet/issues/21)
+- changed from deprecated librosa to modern soundfile.write(soundrate=16000) in `generate_samples.py`
 
 ## References
+- pytorch=wavenet repo on GitHub (for base WaveNet code)
 
 
 ## Attributions
