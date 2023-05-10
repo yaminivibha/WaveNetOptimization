@@ -37,7 +37,6 @@ if use_cuda:
     print("move model to gpu")
     model.cuda()
     gpus = torch.cuda.device_count()
-    dist.init_process_group("gloo", rank=rank, world_size=world_size)
     if(gpus == 1):
         model = torch.nn.parallel.DataParallel(model)
     elif(gpus == 2):
