@@ -59,6 +59,7 @@ class WavenetTrainer:
                                                       num_workers=8,
                                                       pin_memory=False)
         step = continue_training_at_step
+        start = time.time()
         for current_epoch in range(epochs):
             print("epoch", current_epoch)
             tic = time.time()
@@ -89,6 +90,11 @@ class WavenetTrainer:
                     torch.save(self.model, self.snapshot_path + '/' + self.snapshot_name + '_' + time_string)
 
                 self.logger.log(step, loss)
+        self.logger.log("Training duration")
+        self.logger.log(time.time() - start)
+        print("TRAINING DURATION!!!")
+        print(time.time() - start)
+        print("time: ", time.time())
 
     def validate(self):
         self.model.eval()
