@@ -97,12 +97,14 @@ class TensorboardLogger(Logger):
 
     def scalar_summary(self, tag, value, step):
         """Log a scalar variable."""
+        '''
+
         with self.writer.as_default():
             tf.summary.scalar(tag, value, step=step)
-        '''
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
         self.writer.add_summary(summary, step)
         '''
+        return
 
     def image_summary(self, tag, images, step):
         """Log a list of images."""
