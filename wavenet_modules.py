@@ -127,4 +127,5 @@ def constant_pad_1d(input,
                     dimension=0,
                     value=0,
                     pad_start=False):
-    return ConstantPad1d(target_size, dimension, value, pad_start)(input)
+    cp1d = ConstantPad1d.apply(target_size, dimension, value, pad_start)
+    return cp1d(input)
