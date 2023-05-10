@@ -29,28 +29,28 @@ model = WaveNetModelStatic(layers=10,
                      bias=True)
 
 #model = load_latest_model_from('snapshots', use_cuda=True)
-#model = torch.load('snapshots/some_model')
+#model = torch.load('snapshots/some_model') 
 
 if use_cuda:
     print("move model to gpu")
     model.cuda()
     gpus = torch.cuda.device_count()
     if(gpus == 1):
-        model = torch.nn.DataParallel(model)
+        model = torch.nn.parallel.DistributedDataParallel(model)
     elif(gpus == 2):
-        model = torch.nn.DataParallel(model, [0,1])
+        model = torch.nn.parallel.DistributedDataParallel(model, [0,1])
     elif(gpus == 3):
-        model = torch.nn.DataParallel(model, [0,1,2])
+        model = torch.nn.parallel.DistributedDataParallel(model, [0,1,2])
     elif(gpus == 4):
-        model = torch.nn.DataParallel(model, [0,1,2,3])
+        model = torch.nn.parallel.DistributedDataParallel(model, [0,1,2,3])
 
 print('model: ', model)
-print('receptive field: ', model.receptive_field)
-print('parameter count: ', model.parameter_count())
+print('receptive field: ', model.module.receptive_field)
+print('parameter count: ', model.module.parameter_count())
 
 data = WavenetDataset(dataset_file='train_samples/bach_chaconne/dataset.npz',
-                      item_length=model.receptive_field + model.output_length - 1,
-                      target_length=model.output_length,
+                      item_length=model.module.receptive_field + model.module.output_length - 1,
+                      target_length=model.module.output_length,
                       file_location='train_samples/bach_chaconne',
                       test_stride=500)
 print('the dataset has ' + str(len(data)) + ' items')
