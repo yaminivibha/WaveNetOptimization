@@ -3,11 +3,12 @@ benchmarking + optimizing WaveNet, a GNN for generating raw audio
 Using AIHWToolkit, Analog AI testing toolkit open-sourced by IBM
 
 Project slides available here
+
 IEEE report available here
 
 #### Yamini Ananth yva2002, Stan Liao
 
-## Environment Setup
+## VM Specs and Environment Setup
 
 Create a Linux VM on GCP with the following specifications:
 - N1-highmem2 (13GB)
@@ -22,6 +23,14 @@ $ source wavenet_env/bin/activate
 $ git clone https://github.com/yaminivibha/WaveNetOptimization.git
 $ cd WaveNetOptimization
 $ bash setup.sh
+```
+
+
+## Running VM after initial setup
+```
+$ source wavenet_env/bin/activate
+$ pip uninstall nvidia_cublas_cu11
+$ cd WaveNetOptimization
 ```
 
 ## Setting up Wavenet with AIHWToolkit
