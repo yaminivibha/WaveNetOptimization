@@ -30,7 +30,7 @@ args = argparser.parse_args()
 model = model = load_to_cpu("snapshots/chaconne_model_2017-12-28_16-44-12")
 
 print("model: ", model)
-print("receptive field: ", model.module.receptive_field)
+print("receptive field: ", model.receptive_field)
 print("parameter count: ", model.parameter_count())
 
 # loading data
