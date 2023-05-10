@@ -15,7 +15,7 @@ from wavenet_training import *
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument(
-    "--audio_filename", type=str, default="latest_generated_clip.wav"
+    "--audio_filename", type=str, default="latest_generated_clip"
 )
 argparser.add_argument("--quantize_dynamic", type=bool, default=True)
 argparser.add_argument(
@@ -66,7 +66,7 @@ quantized_model = torch.quantization.quantize_dynamic(
 quantization_runtime = time.time() - start
 
 start = time.time()
-generated = quantized_model.generate_fast(
+quantized_generated = quantized_model.generate_fast(
     num_samples=args.length,
     first_samples=start_data,
     progress_callback=prog_callback,
@@ -78,7 +78,8 @@ quantized_generation_runtime = time.time() - start
 
 print(generated)
 
-sf.write(args.audio_filename, generated, samplerate=10000)
+sf.write(args.audio_filename + "_regular.wav", generated, samplerate=10000)
+sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
 
 
 outfile = open(args.benchmark_filename, "a")
