@@ -26,10 +26,11 @@ argparser.add_argument("--sample_length", type=int, default=50000)
 args = argparser.parse_args()
 
 # loading latest model from snapshot
-model = load_latest_model_from("snapshots", use_cuda=False)
+#model = load_latest_model_from("snapshots", use_cuda=False)
+model = model = load_to_cpu("snapshots/chaconne_model_2017-12-28_16-44-12")
 
 print("model: ", model)
-print("receptive field: ", model.receptive_field)
+print("receptive field: ", model.module.receptive_field)
 print("parameter count: ", model.parameter_count())
 
 # loading data
