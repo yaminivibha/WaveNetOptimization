@@ -290,14 +290,14 @@ class WaveNetModelStatic(nn.Module):
                 # sample from softmax distribution
                 x /= temperature
                 prob = F.softmax(x, dim=0)
-                prob = prob.cpu()
+                prob = prob
                 np_prob = prob.data.numpy()
                 x = np.random.choice(self.classes, p=np_prob)
                 x = np.array([x])
             else:
                 # convert to sample value
                 x = torch.max(x, 0)[1][0]
-                x = x.cpu()
+                x = x
                 x = x.data.numpy()
 
             o = (x / self.classes) * 2. - 1
@@ -349,5 +349,5 @@ def load_latest_model_from(location, use_cuda=True):
 
 def load_to_cpu(path):
     model = torch.load(path, map_location=lambda storage, loc: storage)
-    model.cpu()
+    model.cuda()
     return model
