@@ -11,10 +11,7 @@ import torch.quantization
 from audio_data import WavenetDataset
 from wavenet_model import *
 from wavenet_training import *
-import warnings
 
-warnings.filterwarnings("ignore", category=UserWarning) 
-warnings.filterwarnings("ignore", category=SourceChangeWarning)
 
 # Setting up arguments for experimentation
 argparser = argparse.ArgumentParser()
