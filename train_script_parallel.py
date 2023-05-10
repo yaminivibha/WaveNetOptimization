@@ -9,6 +9,8 @@ from wavenet_training import *
 from model_logging import *
 from scipy.io import wavfile
 
+import torch.distributed as dist
+
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
 
@@ -35,14 +37,15 @@ if use_cuda:
     print("move model to gpu")
     model.cuda()
     gpus = torch.cuda.device_count()
+    dist.init_process_group("gloo", rank=rank, world_size=world_size)
     if(gpus == 1):
-        model = torch.nn.parallel.DistributedDataParallel(model)
+        model = torch.nn.parallel.DataParallel(model)
     elif(gpus == 2):
-        model = torch.nn.parallel.DistributedDataParallel(model, [0,1])
+        model = torch.nn.parallel.DataParallel(model, [0,1])
     elif(gpus == 3):
-        model = torch.nn.parallel.DistributedDataParallel(model, [0,1,2])
+        model = torch.nn.parallel.DataParallel(model, [0,1,2])
     elif(gpus == 4):
-        model = torch.nn.parallel.DistributedDataParallel(model, [0,1,2,3])
+        model = torch.nn.parallel.DataParallel(model, [0,1,2,3])
 
 print('model: ', model)
 print('receptive field: ', model.module.receptive_field)
