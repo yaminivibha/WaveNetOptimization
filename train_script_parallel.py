@@ -96,4 +96,5 @@ trainer = WavenetTrainer(model=model,
 print('start training...')
 trainer.train(batch_size=2,
               epochs=10,
-              continue_training_at_step=0)
+              continue_training_at_step=0,
+              use_cuda=True)

@@ -51,7 +51,8 @@ class WavenetTrainer:
     def train(self,
               batch_size=32,
               epochs=10,
-              continue_training_at_step=0):
+              continue_training_at_step=0,
+              use_cuda = False):
         self.model.train()
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
@@ -66,6 +67,10 @@ class WavenetTrainer:
             for (x, target) in iter(self.dataloader):
                 x = Variable(x.type(self.dtype))
                 target = Variable(target.view(-1).type(self.ltype))
+
+                if(use_cuda):
+                    x.cuda()
+                    target.cuda()
 
                 output = self.model(x)
                 loss = F.cross_entropy(output.squeeze(), target.squeeze())
