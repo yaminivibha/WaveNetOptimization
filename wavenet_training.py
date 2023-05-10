@@ -70,9 +70,10 @@ class WavenetTrainer:
 
                 if(use_cuda):
                     output = self.model(x.cuda())
+                    loss = F.cross_entropy(output.squeeze(), target.cuda().squeeze())
                 else:
                     output = self.model(x)
-                loss = F.cross_entropy(output.squeeze(), target.squeeze())
+                    loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()
                 loss.backward()
                 #loss = loss.data[0]
