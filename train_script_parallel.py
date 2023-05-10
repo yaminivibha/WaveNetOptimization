@@ -2,6 +2,7 @@
 
 import time
 from wavenet_model import *
+from wavenet_model_static import *
 from audio_data import WavenetDataset
 from wavenet_training import *
 from model_logging import *
