@@ -60,7 +60,7 @@ print('the dataset has ' + str(len(data)) + ' items')
 
 def generate_and_log_samples(step):
     sample_length=32000
-    gen_model = load_latest_model_from('snapshots', use_cuda=False)
+    gen_model = load_latest_model_from('snapshots', use_cuda=True)
     print("start generating...")
     samples = generate_audio(gen_model,
                              length=sample_length,
