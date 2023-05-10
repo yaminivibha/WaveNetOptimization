@@ -14,7 +14,7 @@ from wavenet_training import *
 import warnings
 
 warnings.filterwarnings("ignore", category=UserWarning) 
-
+warnings.filterwarnings("ignore", category=SourceChangeWarning)
 
 # Setting up arguments for experimentation
 argparser = argparse.ArgumentParser()
@@ -22,9 +22,9 @@ argparser.add_argument(
     "--audio_filename", type=str, default="latest_generated_clip"
 )
 
-argparser.add_argument("--generate_original", type=bool, default=False)
-argparser.add_argument("--quantize_dynamic", type=bool, default=False)
-argparser.add_argument("--quantize_static", type=bool, default=False)
+argparser.add_argument("--generate_original", action="store_true")
+argparser.add_argument("--quantize_dynamic", action="store_true")
+argparser.add_argument("--quantize_static", action="store_true")
 argparser.add_argument("--sample_length", type=int, default=50000)
 args = argparser.parse_args()
 
