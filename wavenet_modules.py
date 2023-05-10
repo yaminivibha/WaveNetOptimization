@@ -77,7 +77,7 @@ class DilatedQueue:
         self.in_pos = 0
         self.out_pos = 0
 
-'''
+
 class ConstantPad1d(Function):
     def __init__(self, target_size, dimension=0, value=0, pad_start=False):
         super(ConstantPad1d, self).__init__()
@@ -86,6 +86,7 @@ class ConstantPad1d(Function):
         self.value = value
         self.pad_start = pad_start
 
+    @staticmethod
     def forward(self, input):
         self.num_pad = self.target_size - input.size(self.dimension)
         assert self.num_pad >= 0, 'target size has to be greater than input size'
@@ -106,6 +107,7 @@ class ConstantPad1d(Function):
         c_output.copy_(input)
         return output
 
+    @staticmethod
     def backward(self, grad_output):
         grad_input = grad_output.new(*self.input_size).zero_()
         cg_output = grad_output
@@ -118,11 +120,11 @@ class ConstantPad1d(Function):
 
         grad_input.copy_(cg_output)
         return grad_input
-'''
+
 
 def constant_pad_1d(input,
                     target_size,
                     dimension=0,
                     value=0,
                     pad_start=False):
-    return torch.nn.ConstantPad1d(target_size, dimension, value, pad_start)(input)
+    return ConstantPad1d(target_size, dimension, value, pad_start)(input)
