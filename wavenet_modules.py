@@ -78,7 +78,7 @@ class DilatedQueue:
         self.out_pos = 0
 
 
-class ConstantPad1d(Function):
+class ConstantPad1d(nn.Module):
     def __init__(self, target_size, dimension=0, value=0, pad_start=False):
         super(ConstantPad1d, self).__init__()
         self.target_size = target_size
@@ -87,7 +87,7 @@ class ConstantPad1d(Function):
         self.pad_start = pad_start
 
     @staticmethod
-    def forward(self, input):
+    def forward(self, input, target_size, dimension=0, value=0, pad_start=False):
         self.num_pad = self.target_size - input.size(self.dimension)
         assert self.num_pad >= 0, 'target size has to be greater than input size'
 
@@ -118,7 +118,7 @@ class ConstantPad1d(Function):
         else:
             cg_output = cg_output.narrow(self.dimension, 0, cg_output.size(self.dimension) - self.num_pad)
 
-        grad_input.copy_(cg_output)
+        grad_input.copy_(cg_output) 
         return grad_input
 
 
@@ -127,5 +127,5 @@ def constant_pad_1d(input,
                     dimension=0,
                     value=0,
                     pad_start=False):
-    return ConstantPad1d(target_size, dimension, value, pad_start).apply(input)
+    return ConstantPad1d(target_size, dimension, value, pad_start)(input)
      
