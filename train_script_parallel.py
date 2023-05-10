@@ -1,5 +1,8 @@
 # Adapted from https://github.com/vincentherrmann/pytorch-wavenet/blob/master/train_script.py
 # training w/ wavenet_model_static.py to try to see if that fixes static issues
+import os 
+os.environ['CUDA_VISIBLE_DEVICES'] ='0'
+
 
 import time
 from wavenet_model import *
