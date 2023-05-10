@@ -37,14 +37,16 @@ if use_cuda:
     print("move model to gpu")
     model.cuda()
     gpus = torch.cuda.device_count()
-    if(gpus == 1):
-        model = torch.nn.parallel.DataParallel(model)
+    
+    model = torch.nn.parallel.DataParallel(model)
+    '''
     elif(gpus == 2):
         model = torch.nn.parallel.DataParallel(model, [0,1])
     elif(gpus == 3):
         model = torch.nn.parallel.DataParallel(model, [0,1,2])
     elif(gpus == 4):
         model = torch.nn.parallel.DataParallel(model, [0,1,2,3])
+    '''
 
 print('model: ', model)
 print('receptive field: ', model.module.receptive_field)
