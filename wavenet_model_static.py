@@ -127,7 +127,7 @@ class WaveNetModelStatic(nn.Module):
 
     def wavenet(self, input, dilation_func):
 
-        x = self.start_conv(input)
+        x = self.start_conv(input.cuda())
         skip = 0
 
         # WaveNet layers
