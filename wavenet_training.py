@@ -28,7 +28,7 @@ class WavenetTrainer:
                  gradient_clipping=None,
                  logger=Logger(),
                  snapshot_path=None,
-                 snapshot_name='snapshot',
+                 snapshot_name='snapshot1',
                  snapshot_interval=1000,
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
