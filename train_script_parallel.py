@@ -1,18 +1,11 @@
 # Adapted from https://github.com/vincentherrmann/pytorch-wavenet/blob/master/train_script.py
-# training w/ wavenet_model_static.py to try to see if that fixes static issues
-import os 
-os.environ['CUDA_VISIBLE_DEVICES'] ='0'
-
 
 import time
 from wavenet_model import *
-from wavenet_model_static import *
 from audio_data import WavenetDataset
 from wavenet_training import *
 from model_logging import *
 from scipy.io import wavfile
-
-import torch.distributed as dist
 
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
@@ -34,28 +27,19 @@ model = WaveNetModelStatic(layers=10,
                      bias=True)
 
 #model = load_latest_model_from('snapshots', use_cuda=True)
-#model = torch.load('snapshots/some_model') 
+#model = torch.load('snapshots/some_model')
 
 if use_cuda:
     print("move model to gpu")
     model.cuda()
-    gpus = torch.cuda.device_count()
-    if(gpus == 1):
-        model = torch.nn.parallel.DataParallel(model)
-    elif(gpus == 2):
-        model = torch.nn.parallel.DataParallel(model, [0,1])
-    elif(gpus == 3):
-        model = torch.nn.parallel.DataParallel(model, [0,1,2])
-    elif(gpus == 4):
-        model = torch.nn.parallel.DataParallel(model, [0,1,2,3])
 
 print('model: ', model)
-print('receptive field: ', model.module.receptive_field)
-print('parameter count: ', model.module.parameter_count())
+print('receptive field: ', model.receptive_field)
+print('parameter count: ', model.parameter_count())
 
 data = WavenetDataset(dataset_file='train_samples/bach_chaconne/dataset.npz',
-                      item_length=model.module.receptive_field + model.module.output_length - 1,
-                      target_length=model.module.output_length,
+                      item_length=model.receptive_field + model.output_length - 1,
+                      target_length=model.output_length,
                       file_location='train_samples/bach_chaconne',
                       test_stride=500)
 print('the dataset has ' + str(len(data)) + ' items')
@@ -63,7 +47,7 @@ print('the dataset has ' + str(len(data)) + ' items')
 
 def generate_and_log_samples(step):
     sample_length=32000
-    gen_model = load_latest_model_from('snapshots', use_cuda=True)
+    gen_model = load_latest_model_from('snapshots', use_cuda=False)
     print("start generating...")
     samples = generate_audio(gen_model,
                              length=sample_length,
@@ -97,7 +81,6 @@ trainer = WavenetTrainer(model=model,
                          ltype=ltype)
 
 print('start training...')
-trainer.train(batch_size=2,
+trainer.train(batch_size=16,
               epochs=10,
-              continue_training_at_step=0,
-              use_cuda=True)
+              continue_training_at_step=0)
