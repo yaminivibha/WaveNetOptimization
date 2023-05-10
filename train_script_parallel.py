@@ -11,7 +11,7 @@ from scipy.io import wavfile
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
 
-use_cuda = torch.cuda.is_available()
+#use_cuda = torch.cuda.is_available()
 if use_cuda:
     print('use gpu')
     dtype = torch.cuda.FloatTensor
