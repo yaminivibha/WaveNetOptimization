@@ -200,6 +200,7 @@ class WaveNetModelStatic(nn.Module):
         x = x.view(n * l, c)
         return x
 
+    '''
     def generate(self,
                  num_samples,
                  first_samples=None,
@@ -238,7 +239,8 @@ class WaveNetModelStatic(nn.Module):
 
         self.train()
         return mu_gen
-
+    '''
+    
     def generate_fast(self,
                       num_samples,
                       first_samples=None,
