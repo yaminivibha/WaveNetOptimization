@@ -30,8 +30,8 @@ class WavenetTrainer:
                  snapshot_path=None,
                  snapshot_name='snapshot1',
                  snapshot_interval=1000,
-                 dtype=torch.cuda.FloatTensor,
-                 ltype=torch.cuda.LongTensor):
+                 dtype=torch.FloatTensor,
+                 ltype=torch.LongTensor):
         self.model = model
         self.dataset = dataset
         self.dataloader = None
