@@ -12,6 +12,7 @@ dtype = torch.FloatTensor
 ltype = torch.LongTensor
 
 #use_cuda = torch.cuda.is_available()
+use_cuda = False
 if use_cuda:
     print('use gpu')
     dtype = torch.cuda.FloatTensor
