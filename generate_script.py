@@ -5,7 +5,7 @@ from audio_data import WavenetDataset
 from wavenet_training import *
 import soundfile as sf
 
-model = load_latest_model_from("snapshots", use_cuda=True)
+model = load_latest_model_from("snapshots", use_cuda=False)
 
 print("model: ", model)
 print("receptive field: ", model.receptive_field)

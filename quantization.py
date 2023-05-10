@@ -25,7 +25,7 @@ argparser.add_argument("--length", type=int, default=100000)
 
 args = argparser.parse_args()
 
-model = load_latest_model_from("snapshots", use_cuda=True)
+model = load_latest_model_from("snapshots", use_cuda=False)
 
 print("model: ", model)
 print("receptive field: ", model.receptive_field)
@@ -58,6 +58,7 @@ generated = model.generate_fast(
     regularize=0.0,
 )
 regular_generation_runtime = time.time() - start
+sf.write(args.audio_filename + "_regular.wav", generated, samplerate=10000)
 
 start = time.time()
 quantized_model = torch.quantization.quantize_dynamic(
@@ -78,7 +79,7 @@ quantized_generation_runtime = time.time() - start
 
 print(generated)
 
-sf.write(args.audio_filename + "_regular.wav", generated, samplerate=10000)
+
 sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
 
 
