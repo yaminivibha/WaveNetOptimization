@@ -1,4 +1,4 @@
-# Adapted from https://github.com/vincentherrmann/pytorch-wavenet
+# Sections are adapted from https://github.com/vincentherrmann/pytorch-wavenet
 import os
 import os.path
 import time
@@ -242,6 +242,10 @@ class WaveNetModel(nn.Module):
                       regularize=0.,
                       progress_callback=None,
                       progress_interval=100):
+        """
+        Fast generation of samples usinc caching
+        as introduced in https://arxiv.org/abs/1611.09482
+        """
         self.eval()
         if first_samples is None:
             first_samples = torch.LongTensor(1).zero_() + (self.classes // 2)
@@ -330,7 +334,7 @@ class WaveNetModel(nn.Module):
 
 def load_latest_model_from(location, use_cuda=True):
     files = [location + "/" + f for f in os.listdir(location)]
-    newest_file = max(files, key=os.path.getctime)
+    newest_file = min(files, key=os.path.getctime)
     print("load model " + newest_file)
 
     if use_cuda:

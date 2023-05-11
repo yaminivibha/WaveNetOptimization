@@ -67,6 +67,7 @@ print("#### QUANTIZATION BENCHMARKS ###", )
 if args.generate_original:
     start = time.time()
     generated = generate_audio(model)
+    
     regular_generation_runtime = time.time() - start
 
     print(generated)
