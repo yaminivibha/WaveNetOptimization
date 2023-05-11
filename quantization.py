@@ -22,12 +22,16 @@ argparser.add_argument(
 argparser.add_argument("--generate_original", action="store_true")
 argparser.add_argument("--quantize_dynamic", action="store_true")
 argparser.add_argument("--quantize_static", action="store_true")
+argparser.add_argument("--quant_aware_training", action = "store_true")
+argparser.add_argument("--model", "-m", type=str, default="latest")
 argparser.add_argument("--sample_length", type=int, default=50000)
 args = argparser.parse_args()
 
 # loading latest model from snapshot
-#model = load_latest_model_from("snapshots", use_cuda=False)
-model = load_to_cpu("snapshots/chaconne_model_2023-05-11_09-55-20")
+if(args.model == "latest"):
+    model = load_latest_model_from("snapshots", use_cuda=False)
+else:
+    model = load_to_cpu("snapshots/" + args.model)
 
 print("model: ", model)
 print("receptive field: ", model.receptive_field)
@@ -107,7 +111,7 @@ if args.quantize_static:
     start = time.time()
     quantized_model = torch.quantization.convert(model)
     quantization_runtime = time.time() - start
-    print(f"Time taken to Dynamically Quantize: {quantization_runtime} seconds")
+    print(f"Time taken to Statically Quantize: {quantization_runtime} seconds")
 
     start = time.time()
     quantized_generated = generate_audio(quantized_model)
@@ -115,6 +119,22 @@ if args.quantize_static:
     sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
     print(
     f"Statically Quantized audio generation time (inference): {quantized_generation_runtime} seconds"
+    )
+
+# Running for Quantization Aware Training
+# Prerequisite: Run train_script_qat first
+if args.quant_aware_training:
+    start = time.time()
+    quantized_model = torch.quantization.convert(model.eval(), inplace=False)
+    quantization_runtime = time.time() - start
+    print(f"Time taken to Quantize our quantization-aware-trained model: {quantization_runtime} seconds")
+
+    start = time.time()
+    quantized_generated = generate_audio(quantized_model)
+    quantized_generation_runtime = time.time() - start
+    sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
+    print(
+    f"Quantization aware training audio generation time (inference): {quantized_generation_runtime} seconds"
     )
 
 print("#### END QUANTIZATION BENCHMARKS ###")

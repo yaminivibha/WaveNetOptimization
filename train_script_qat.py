@@ -2,6 +2,7 @@
 
 import time
 from wavenet_model import *
+from wavenet_model_static import *
 from audio_data import WavenetDataset
 from wavenet_training import *
 from model_logging import *
@@ -10,13 +11,17 @@ from scipy.io import wavfile
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
 
+'''
 use_cuda = torch.cuda.is_available()
 if use_cuda:
     print('use gpu')
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
+    model.cuda()
+'''
 
-model = WaveNetModel(layers=10,
+#use "static" model because we want the Quant/DeQuant layers
+model = WaveNetModelStatic(layers=10,
                      blocks=3,
                      dilation_channels=32,
                      residual_channels=32,
@@ -34,9 +39,7 @@ torch.quantization.prepare_qat(model, inplace=True)
 #model = load_latest_model_from('snapshots', use_cuda=True)
 #model = torch.load('snapshots/some_model')
 
-if use_cuda:
-    print("move model to gpu")
-    model.cuda()
+
 
 print('model: ', model)
 print('receptive field: ', model.receptive_field)
