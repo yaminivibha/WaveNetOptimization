@@ -107,9 +107,9 @@ However, it is possible that if we did hyperparameter optimization on our model 
 
 | Model Type | Mean per-epoch training time (hr) | Mean post-training  quantization - time to convert  (s) over 100 trials | Model Size (MB) | Mean fast_generate runtime (s) over 100 trials  | CPU utilization of fast_generate (%) |
 | --- | --- | --- | --- | --- | --- |
-| No Quantization | 9.22 | — | 6.998 | 118.293 | 200 |
+| No Quantization | 3.22 | — | 6.998 | 118.293 | 200 |
 | Post Training Dynamic Quantization | — | 11.09 | 6.998 | 100.234 | 200 |
-| Post Training Static Quantization | — | 16.30 | 3.526 | 98.938 | 200 |
+| Post Training Static Quantization | 3.48 | 16.30 | 3.526 | 98.938 | 200 |
 
 In order to implement static quantization, it was necessary to add quantization stubs to the WaveNet constructor and retrain on the Bach-Chaconne dataset. Because quantization on PyTorch is not supported over GPU, we unfortunately could not accelerate training using parallelization, distributed training, or the accelerated compute power of the GPU. Thus, trained for only one epoch; however, due to the dense convolutional layers and sample density in the training data, this process still took approximately 6.23 hours.
 
