@@ -18,13 +18,11 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument(
     "--audio_filename", type=str, default="latest_generated_clip"
 )
-
-argparser.add_argument("--generate_original", action="store_true")
-argparser.add_argument("--quantize_dynamic", action="store_true")
-argparser.add_argument("--quantize_static", action="store_true")
-argparser.add_argument("--quant_aware_training", action = "store_true")
-argparser.add_argument("--model", "-m", type=str, default="latest")
-argparser.add_argument("--sample_length", type=int, default=50000)
+argparser.add_argument("--generate_original", action="store_true", help="Generate non-quantized audio")
+argparser.add_argument("--quantize_dynamic", action="store_true", help="Quantize model dynamically")
+argparser.add_argument("--quantize_static", action="store_true", help="Quantize model statically")
+argparser.add_argument("--model", "-m", type=str, default="latest", help="Model to use")
+argparser.add_argument("--sample_length", type=int, default=50000, help="Length of generated sample")
 args = argparser.parse_args()
 
 # loading latest model from snapshot
@@ -135,22 +133,6 @@ if args.quantize_static:
     sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
     print(
     f"Statically Quantized audio generation time (inference): {quantized_generation_runtime} seconds"
-    )
-
-# Running for Quantization Aware Training
-# Prerequisite: Run train_script_qat first
-if args.quant_aware_training:
-    start = time.time()
-    quantized_model = torch.quantization.convert(model.eval(), inplace=False)
-    quantization_runtime = time.time() - start
-    print(f"Time taken to Quantize our quantization-aware-trained model: {quantization_runtime} seconds")
-
-    start = time.time()
-    quantized_generated = generate_audio(quantized_model)
-    quantized_generation_runtime = time.time() - start
-    sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
-    print(
-    f"Quantization aware training audio generation time (inference): {quantized_generation_runtime} seconds"
     )
 
 print("#### END QUANTIZATION BENCHMARKS ###")
