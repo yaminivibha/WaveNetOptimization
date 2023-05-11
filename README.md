@@ -4,7 +4,7 @@ IEEE report available here
 
 #### Yamini Ananth yva2002, Stan Liao
 
-## Submitted Files
+## File Structure
 ```
 ├── WaveNetOptimization
 │   ├── snapshots
@@ -46,7 +46,11 @@ $ cd WaveNetOptimization
 $ bash setup.sh
 ```
 
-This will take care of installing all required packages and removing unused libraries from the defauly CUDA installation. 
+This will take care of installing all required packages and removing unused libraries from the default CUDA installation. 
+
+## Project Objectives
+- applying caching for faster inference in WaveNet; benchmarking the speedup of the fast inference method
+- applying post-training dynamic and static quantization to WaveNet and observing their effect on model size, inference time, and cpu utilization during inference.
 
 ## Running Experiments
 If you wish to replicate portions of the experiments run in the paper, the following command is recommended
@@ -68,9 +72,16 @@ optional arguments:
                         Length of generated sample
 ```
 
+An example of running this to generate non-quantized audio over 100 trials of length 30000 samples (approx 2 seconds) is included here:
+
+```
+python3 quantization.py --audio_filename original_audio/generated_sample --generate_original --model=="latest" --sample_length=30000 --trials 100 > original_benchmarks.txt
+
+```
+
 To measure CPU utilization, run a single call of `quantization.py` using the `top` command in Linux, for instance:
 ```
-$ top python3 quantization.py --dynamic_quantization 
+$ top python3 quantization.py --quantize_dynamic --trials 1 --sample_length 30000 
 ```
 
 ## Results 
@@ -108,14 +119,14 @@ To measure model size, we specifically considered the size of the model paramete
 Thank you to Professor Kauotar and Professor Parijat Dube for holding the course COMS6998 High Performance Machine Learning at Columbia University in Spring 2023. We learned a great deal from the course and will carry the experience through future professional work and research. 
 
 ## References
-Paine, T. L., Khorrami, P., Chang, S., Zhang, Y., Ramachandran, P., Hasegawa-Johnson, M. A., & Huang, T. S. (2016). Fast Wavenet Generation Algorithm. *ArXiv [Cs.SD]*. Retrieved from http://arxiv.org/abs/1611.09482
-
-van den Oord, A., Dieleman, S., Zen, H., Simonyan, K., Vinyals, O., Graves, A., … Kavukcuoglu, K. (2016). WaveNet: A Generative Model for Raw Audio. *ArXiv [[Cs.SD](Http://Cs.Sd/)]*. Retrieved from http://arxiv.org/abs/1609.03499
-
-Herrmann, V. (2017). Open Source PyTorch Wavenet implementation. *Github*.
+Herrmann, V. (2017). Open Source PyTorch Wavenet implementation. Retrieved from https://github.com/vincentherrmann/pytorch-wavenet
 
 Krishnamoorthi, R. (2020, March 26). *Quantization in PyTorch*. PyTorch. Retrieved May 11, 2023, from https://pytorch.org/blog/introduction-to-quantization-on-pytorch/
 
-Kuchaiev, O., Ginsburg, B., Gitman, I., Lavrukhin, V., Li, J., Nguyen, H., … Micikevicius, P. (2018). Mixed-Precision Training for NLP and Speech Recognition with OpenSeq2Seq. *ArXiv [Cs.CL]*. Retrieved from http://arxiv.org/abs/1805.10387
+Kuchaiev, O., Ginsburg, B., Gitman, I., Lavrukhin, V., Li, J., Nguyen, H., … Micikevicius, P. (2018). Mixed-Precision Training for NLP and Speech Recognition with OpenSeq2Seq. *ArXiv [Cs.CL]*. Retrieved from http://arxiv.org/abs/1805.10387
 
-Pednekar, S., Krishnadas, A., Cho, B., & Makris, N. C. (2023). Weber’s Law of perception is a consequence of resolving the intensity of natural scintillating light and sound with the least possible error. *Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences*, *479*(2271), 20220626. doi:10.1098/rspa.2022.0626
+Paine, T. L., Khorrami, P., Chang, S., Zhang, Y., Ramachandran, P., Hasegawa-Johnson, M. A., & Huang, T. S. (2016). Fast Wavenet Generation Algorithm. *ArXiv [Cs.SD]*. Retrieved from http://arxiv.org/abs/1611.09482
+
+Pednekar, S., Krishnadas, A., Cho, B., & Makris, N. C. (2023). Weber’s Law of perception is a consequence of resolving the intensity of natural scintillating light and sound with the least possible error. *Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences*, *479*(2271), 20220626. doi:10.1098/rspa.2022.0626
+
+van den Oord, A., Dieleman, S., Zen, H., Simonyan, K., Vinyals, O., Graves, A., … Kavukcuoglu, K. (2016). WaveNet: A Generative Model for Raw Audio. *ArXiv [[Cs.SD](Http://Cs.Sd/)]*. Retrieved from http://arxiv.org/abs/1609.0349
