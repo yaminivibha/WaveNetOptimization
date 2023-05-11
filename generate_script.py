@@ -28,7 +28,7 @@ def prog_callback(step, total_steps):
     print(str(100 * step // total_steps) + "% generated")
 
 
-generated = model.generate_fast(
+generated = model.generate(
     num_samples=100000,
     first_samples=start_data,
     progress_callback=prog_callback,

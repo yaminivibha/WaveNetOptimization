@@ -1,4 +1,4 @@
-# Adapted from https://github.com/vincentherrmann/pytorch-wavenet
+# Sections are adapted from https://github.com/vincentherrmann/pytorch-wavenet
 import os
 import os.path
 import time
@@ -242,6 +242,10 @@ class WaveNetModel(nn.Module):
                       regularize=0.,
                       progress_callback=None,
                       progress_interval=100):
+        """
+        Fast generation of samples usinc caching
+        as introduced in https://arxiv.org/abs/1611.09482
+        """
         self.eval()
         if first_samples is None:
             first_samples = torch.LongTensor(1).zero_() + (self.classes // 2)
