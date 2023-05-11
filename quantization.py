@@ -11,10 +11,7 @@ import torch.quantization
 from audio_data import WavenetDataset
 from wavenet_model import *
 from wavenet_training import *
-import warnings
 
-warnings.filterwarnings("ignore", category=UserWarning) 
-warnings.filterwarnings("ignore", category=SourceChangeWarning)
 
 # Setting up arguments for experimentation
 argparser = argparse.ArgumentParser()
@@ -25,11 +22,16 @@ argparser.add_argument(
 argparser.add_argument("--generate_original", action="store_true")
 argparser.add_argument("--quantize_dynamic", action="store_true")
 argparser.add_argument("--quantize_static", action="store_true")
+argparser.add_argument("--quant_aware_training", action = "store_true")
+argparser.add_argument("--model", "-m", type=str, default="latest")
 argparser.add_argument("--sample_length", type=int, default=50000)
 args = argparser.parse_args()
 
 # loading latest model from snapshot
-model = load_latest_model_from("snapshots", use_cuda=False)
+if(args.model == "latest"):
+    model = load_latest_model_from("snapshots", use_cuda=False)
+else:
+    model = load_to_cpu("snapshots/" + args.model)
 
 print("model: ", model)
 print("receptive field: ", model.receptive_field)
@@ -69,6 +71,7 @@ print("#### QUANTIZATION BENCHMARKS ###", )
 if args.generate_original:
     start = time.time()
     generated = generate_audio(model)
+    
     regular_generation_runtime = time.time() - start
 
     print(generated)
@@ -84,6 +87,22 @@ if args.quantize_dynamic:
     )
     quantization_runtime = time.time() - start
     print(f"Time taken to Dynamically Quantize: {quantization_runtime} seconds")
+
+    param_size = 0
+    for param in model.parameters():
+        if param.data.is_floating_point():
+            param_size += param.numel() * torch.finfo(param.data.dtype).bits
+        else:
+            param_size += param.numel() * torch.iinfo(param.data.dtype).bits
+    buffer_size = 0
+    for buffer in model.buffers():
+        if buffer.data.is_floating_point():
+            buffer_size += buffer.numel() * torch.finfo(buffer.data.dtype).bits
+        else:
+            buffer_size += buffer.numel() * torch.iinfo(buffer.data.dtype).bits
+
+    size_all_mb = (param_size + buffer_size) / 1024**2
+    print('Quantized model size: {:.3f}MB'.format(size_all_mb))
 
     start = time.time()
     quantized_generated = generate_audio(quantized_model)
@@ -108,7 +127,7 @@ if args.quantize_static:
     start = time.time()
     quantized_model = torch.quantization.convert(model)
     quantization_runtime = time.time() - start
-    print(f"Time taken to Dynamically Quantize: {quantization_runtime} seconds")
+    print(f"Time taken to Statically Quantize: {quantization_runtime} seconds")
 
     start = time.time()
     quantized_generated = generate_audio(quantized_model)
@@ -116,6 +135,22 @@ if args.quantize_static:
     sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
     print(
     f"Statically Quantized audio generation time (inference): {quantized_generation_runtime} seconds"
+    )
+
+# Running for Quantization Aware Training
+# Prerequisite: Run train_script_qat first
+if args.quant_aware_training:
+    start = time.time()
+    quantized_model = torch.quantization.convert(model.eval(), inplace=False)
+    quantization_runtime = time.time() - start
+    print(f"Time taken to Quantize our quantization-aware-trained model: {quantization_runtime} seconds")
+
+    start = time.time()
+    quantized_generated = generate_audio(quantized_model)
+    quantized_generation_runtime = time.time() - start
+    sf.write(args.audio_filename + "_quantized.wav", quantized_generated, samplerate=10000)
+    print(
+    f"Quantization aware training audio generation time (inference): {quantized_generation_runtime} seconds"
     )
 
 print("#### END QUANTIZATION BENCHMARKS ###")

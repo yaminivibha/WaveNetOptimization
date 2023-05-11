@@ -78,7 +78,7 @@ class DilatedQueue:
         self.out_pos = 0
 
 
-class ConstantPad1d(Function):
+class ConstantPad1d(nn.Module):
     def __init__(self, target_size, dimension=0, value=0, pad_start=False):
         super(ConstantPad1d, self).__init__()
         self.target_size = target_size
@@ -126,3 +126,4 @@ def constant_pad_1d(input,
                     value=0,
                     pad_start=False):
     return ConstantPad1d(target_size, dimension, value, pad_start)(input)
+     

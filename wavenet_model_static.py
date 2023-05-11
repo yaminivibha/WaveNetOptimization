@@ -1,4 +1,4 @@
-# Sections are adapted from https://github.com/vincentherrmann/pytorch-wavenet
+# Adapted from https://github.com/vincentherrmann/pytorch-wavenet
 import os
 import os.path
 import time
@@ -6,7 +6,7 @@ from wavenet_modules import *
 from audio_data import *
 
 
-class WaveNetModel(nn.Module):
+class WaveNetModelStatic(nn.Module):
     """
     A Complete Wavenet Model
 
@@ -39,7 +39,7 @@ class WaveNetModel(nn.Module):
                  dtype=torch.FloatTensor,
                  bias=False):
 
-        super(WaveNetModel, self).__init__()
+        super(WaveNetModelStatic, self).__init__()
 
         self.layers = layers
         self.blocks = blocks
@@ -49,6 +49,9 @@ class WaveNetModel(nn.Module):
         self.classes = classes
         self.kernel_size = kernel_size
         self.dtype = dtype
+        self.quant = torch.ao.quantization.QuantStub()
+        self.dequant = torch.ao.quantization.DeQuantStub()
+
 
         # build model
         receptive_field = 1
@@ -185,8 +188,11 @@ class WaveNetModel(nn.Module):
         return x
 
     def forward(self, input):
+        input = self.quant(input)
+
         x = self.wavenet(input,
                          dilation_func=self.wavenet_dilate)
+        x = self.dequant(x)
 
         # reshape output
         [n, c, l] = x.size()
@@ -196,6 +202,7 @@ class WaveNetModel(nn.Module):
         x = x.view(n * l, c)
         return x
 
+    '''
     def generate(self,
                  num_samples,
                  first_samples=None,
@@ -234,7 +241,8 @@ class WaveNetModel(nn.Module):
 
         self.train()
         return mu_gen
-
+    '''
+    
     def generate_fast(self,
                       num_samples,
                       first_samples=None,
@@ -242,10 +250,6 @@ class WaveNetModel(nn.Module):
                       regularize=0.,
                       progress_callback=None,
                       progress_interval=100):
-        """
-        Fast generation of samples usinc caching
-        as introduced in https://arxiv.org/abs/1611.09482
-        """
         self.eval()
         if first_samples is None:
             first_samples = torch.LongTensor(1).zero_() + (self.classes // 2)
@@ -277,6 +281,7 @@ class WaveNetModel(nn.Module):
         generated = np.array([])
         regularizer = torch.pow(Variable(torch.arange(self.classes)) - self.classes / 2., 2)
         regularizer = regularizer.squeeze() * regularize
+        regularizer = regularizer.cuda()
         tic = time.time()
         for i in range(num_samples):
             x = self.wavenet(input,
@@ -288,14 +293,14 @@ class WaveNetModel(nn.Module):
                 # sample from softmax distribution
                 x /= temperature
                 prob = F.softmax(x, dim=0)
-                prob = prob.cpu()
+                prob = prob
                 np_prob = prob.data.numpy()
                 x = np.random.choice(self.classes, p=np_prob)
                 x = np.array([x])
             else:
                 # convert to sample value
                 x = torch.max(x, 0)[1][0]
-                x = x.cpu()
+                x = x
                 x = x.data.numpy()
 
             o = (x / self.classes) * 2. - 1
@@ -334,7 +339,7 @@ class WaveNetModel(nn.Module):
 
 def load_latest_model_from(location, use_cuda=True):
     files = [location + "/" + f for f in os.listdir(location)]
-    newest_file = min(files, key=os.path.getctime)
+    newest_file = max(files, key=os.path.getctime)
     print("load model " + newest_file)
 
     if use_cuda:
@@ -347,5 +352,5 @@ def load_latest_model_from(location, use_cuda=True):
 
 def load_to_cpu(path):
     model = torch.load(path, map_location=lambda storage, loc: storage)
-    model.cpu()
+    model.cuda()
     return model

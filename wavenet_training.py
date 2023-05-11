@@ -28,7 +28,7 @@ class WavenetTrainer:
                  gradient_clipping=None,
                  logger=Logger(),
                  snapshot_path=None,
-                 snapshot_name='snapshot',
+                 snapshot_name='snapshot1',
                  snapshot_interval=1000,
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
@@ -51,14 +51,16 @@ class WavenetTrainer:
     def train(self,
               batch_size=32,
               epochs=10,
-              continue_training_at_step=0):
+              continue_training_at_step=0,
+              use_cuda = False):
         self.model.train()
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
                                                       shuffle=True,
-                                                      num_workers=8,
+                                                      num_workers=2,
                                                       pin_memory=False)
         step = continue_training_at_step
+        start = time.time()
         for current_epoch in range(epochs):
             print("epoch", current_epoch)
             tic = time.time()
@@ -66,11 +68,15 @@ class WavenetTrainer:
                 x = Variable(x.type(self.dtype))
                 target = Variable(target.view(-1).type(self.ltype))
 
-                output = self.model(x)
-                loss = F.cross_entropy(output.squeeze(), target.squeeze())
+                if(use_cuda):
+                    output = self.model(x.cuda())
+                    loss = F.cross_entropy(output.squeeze(), target.cuda().squeeze())
+                else:
+                    output = self.model(x)
+                    loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()
                 loss.backward()
-                loss = loss.data[0]
+                #loss = loss.data[0]
 
                 if self.clip is not None:
                     torch.nn.utils.clip_grad_norm(self.model.parameters(), self.clip)
@@ -89,6 +95,11 @@ class WavenetTrainer:
                     torch.save(self.model, self.snapshot_path + '/' + self.snapshot_name + '_' + time_string)
 
                 self.logger.log(step, loss)
+        self.logger.log("Training duration")
+        self.logger.log(time.time() - start)
+        print("TRAINING DURATION!!!")
+        print(time.time() - start)
+        print("time: ", time.time())
 
     def validate(self):
         self.model.eval()
@@ -101,11 +112,11 @@ class WavenetTrainer:
 
             output = self.model(x)
             loss = F.cross_entropy(output.squeeze(), target.squeeze())
-            total_loss += loss.data[0]
+            total_loss += loss.data
 
             predictions = torch.max(output, 1)[1].view(-1)
             correct_pred = torch.eq(target, predictions)
-            accurate_classifications += torch.sum(correct_pred).data[0]
+            accurate_classifications += torch.sum(correct_pred).data.item()
         # print("validate model with " + str(len(self.dataloader.dataset)) + " samples")
         # print("average loss: ", total_loss / len(self.dataloader))
         avg_loss = total_loss / len(self.dataloader)

@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import scipy.misc
 import threading
+import torch
 
 try:
     from StringIO import StringIO  # Python 2.7
@@ -69,7 +70,9 @@ class TensorboardLogger(Logger):
                  generate_function=None,
                  log_dir='logs'):
         super().__init__(log_interval, validation_interval, generate_interval, trainer, generate_function)
-        self.writer = tf.summary.FileWriter(log_dir)
+        #self.writer = tf.summary.FileWriter(log_dir)
+        #different from the original code to accomodate parallelism
+        self.writer = tf.summary.create_file_writer('log_dir') 
 
     def log_loss(self, current_step):
         # loss
@@ -95,12 +98,22 @@ class TensorboardLogger(Logger):
 
     def scalar_summary(self, tag, value, step):
         """Log a scalar variable."""
+        
+        my_value = value
+
+        with self.writer.as_default():
+            tf.summary.scalar(tag, torch.Tensor.cpu(torch.tensor([my_value])).item(), step=step)
+
+        '''
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
         self.writer.add_summary(summary, step)
+        '''
+        return
 
     def image_summary(self, tag, images, step):
         """Log a list of images."""
-
+        
+        '''
         img_summaries = []
         for i, img in enumerate(images):
             # Write the image to a string
@@ -120,18 +133,23 @@ class TensorboardLogger(Logger):
         # Create and write Summary
         summary = tf.Summary(value=img_summaries)
         self.writer.add_summary(summary, step)
+        '''
+        return
 
     def audio_summary(self, tag, sample, step, sr=16000):
+        '''
         with tf.Session() as sess:
             audio_summary = tf.summary.audio(tag, sample, sample_rate=sr, max_outputs=4)
             summary = sess.run(audio_summary)
             self.writer.add_summary(summary, step)
             self.writer.flush()
+        '''
+        return
 
 
     def histo_summary(self, tag, values, step, bins=200):
         """Log a histogram of the tensor of values."""
-
+        '''
         # Create a histogram using numpy
         counts, bin_edges = np.histogram(values, bins=bins)
 
@@ -156,9 +174,14 @@ class TensorboardLogger(Logger):
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
         self.writer.add_summary(summary, step)
         self.writer.flush()
+        '''
+        return
 
     def tensor_summary(self, tag, tensor, step):
+        '''
         tf_tensor = tf.Variable(tensor).to_proto()
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, tensor=tf_tensor)])
         #summary = tf.summary.tensor_summary(name=tag, tensor=tensor)
         self.writer.add_summary(summary, step)
+        '''
+        return
