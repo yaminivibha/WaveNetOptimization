@@ -51,12 +51,13 @@ class WavenetTrainer:
     def train(self,
               batch_size=32,
               epochs=10,
-              continue_training_at_step=0):
+              continue_training_at_step=0,
+              use_cuda = False):
         self.model.train()
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
                                                       shuffle=True,
-                                                      num_workers=8,
+                                                      num_workers=2,
                                                       pin_memory=False)
         step = continue_training_at_step
         start = time.time()
@@ -67,8 +68,12 @@ class WavenetTrainer:
                 x = Variable(x.type(self.dtype))
                 target = Variable(target.view(-1).type(self.ltype))
 
-                output = self.model(x)
-                loss = F.cross_entropy(output.squeeze(), target.squeeze())
+                if(use_cuda):
+                    output = self.model(x.cuda())
+                    loss = F.cross_entropy(output.squeeze(), target.cuda().squeeze())
+                else:
+                    output = self.model(x)
+                    loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()
                 loss.backward()
                 #loss = loss.data[0]
@@ -126,6 +131,6 @@ def generate_audio(model,
                    temperatures=[0., 1.]):
     samples = []
     for temp in temperatures:
-        samples.append(model.generate_fast(length, temperature=temp))
+        samples.append(model.module.generate_fast(length, temperature=temp))
     samples = np.stack(samples, axis=0)
     return samples

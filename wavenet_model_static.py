@@ -50,6 +50,7 @@ class WaveNetModelStatic(nn.Module):
         self.kernel_size = kernel_size
         self.dtype = dtype
         self.quant = torch.ao.quantization.QuantStub()
+        self.dequant = torch.ao.quantization.DeQuantStub()
 
 
         # build model
@@ -191,6 +192,7 @@ class WaveNetModelStatic(nn.Module):
 
         x = self.wavenet(input,
                          dilation_func=self.wavenet_dilate)
+        x = self.dequant(x)
 
         # reshape output
         [n, c, l] = x.size()
@@ -279,6 +281,7 @@ class WaveNetModelStatic(nn.Module):
         generated = np.array([])
         regularizer = torch.pow(Variable(torch.arange(self.classes)) - self.classes / 2., 2)
         regularizer = regularizer.squeeze() * regularize
+        regularizer = regularizer.cuda()
         tic = time.time()
         for i in range(num_samples):
             x = self.wavenet(input,

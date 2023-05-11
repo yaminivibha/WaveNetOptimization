@@ -11,10 +11,7 @@ import torch.quantization
 from audio_data import WavenetDataset
 from wavenet_model import *
 from wavenet_training import *
-import warnings
 
-warnings.filterwarnings("ignore", category=UserWarning) 
-warnings.filterwarnings("ignore", category=SourceChangeWarning)
 
 # Setting up arguments for experimentation
 argparser = argparse.ArgumentParser()
@@ -30,6 +27,7 @@ args = argparser.parse_args()
 
 # loading latest model from snapshot
 model = load_latest_model_from("snapshots", use_cuda=False)
+#model = load_to_cpu("snapshots/chaconne_model_2017-12-28_16-44-12")
 
 print("model: ", model)
 print("receptive field: ", model.receptive_field)
