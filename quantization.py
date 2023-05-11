@@ -88,6 +88,22 @@ if args.quantize_dynamic:
     quantization_runtime = time.time() - start
     print(f"Time taken to Dynamically Quantize: {quantization_runtime} seconds")
 
+    param_size = 0
+    for param in model.parameters():
+        if param.data.is_floating_point():
+            param_size += param.numel() * torch.finfo(param.data.dtype).bits
+        else:
+            param_size += param.numel() * torch.iinfo(param.data.dtype).bits
+    buffer_size = 0
+    for buffer in model.buffers():
+        if buffer.data.is_floating_point():
+            buffer_size += buffer.numel() * torch.finfo(buffer.data.dtype).bits
+        else:
+            buffer_size += buffer.numel() * torch.iinfo(buffer.data.dtype).bits
+
+    size_all_mb = (param_size + buffer_size) / 1024**2
+    print('Quantized model size: {:.3f}MB'.format(size_all_mb))
+
     start = time.time()
     quantized_generated = generate_audio(quantized_model)
     quantized_generation_runtime = time.time() - start
