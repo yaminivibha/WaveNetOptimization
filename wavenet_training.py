@@ -57,7 +57,7 @@ class WavenetTrainer:
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
                                                       shuffle=True,
-                                                      num_workers=8,
+                                                      num_workers=2,
                                                       pin_memory=False)
         step = continue_training_at_step
         start = time.time()
