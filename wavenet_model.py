@@ -332,7 +332,7 @@ class WaveNetModel(nn.Module):
         super().cpu()
 
 
-def load_latest_model_from(location, file, use_cuda=True):
+def load_latest_model_from(location, use_cuda=True):
     files = [location + "/" + f for f in os.listdir(location)]
     newest_file = min(files, key=os.path.getctime)
     print("load model " + newest_file)
