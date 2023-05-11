@@ -4,7 +4,7 @@ from wavenet_model import *
 from audio_data import WavenetDataset
 from wavenet_training import *
 import soundfile as sf
-
+import time
 model = load_latest_model_from("snapshots", use_cuda=False)
 
 print("model: ", model)
@@ -27,12 +27,14 @@ start_data = torch.max(start_data, 0)[1]
 def prog_callback(step, total_steps):
     print(str(100 * step // total_steps) + "% generated")
 
+start = time.time
 generated = model.generate(
     num_samples=100000,
     first_samples=start_data,
     temperature=1.0,
 )
-
+end = time.time() - start
+print("Time taken: ", end)
 # generated = model.generate_fast(
 #     num_samples=100000,
 #     first_samples=start_data,
