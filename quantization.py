@@ -27,7 +27,7 @@ args = argparser.parse_args()
 
 # loading latest model from snapshot
 #model = load_latest_model_from("snapshots", use_cuda=False)
-model = load_to_cpu("snapshots/chaconne_model_2023-05-11_14-45-32")
+model = load_to_cpu("snapshots/chaconne_model_2023-05-11_12-21-06")
 
 print("model: ", model)
 print("receptive field: ", model.receptive_field)
