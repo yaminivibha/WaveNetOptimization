@@ -131,6 +131,6 @@ def generate_audio(model,
                    temperatures=[0., 1.]):
     samples = []
     for temp in temperatures:
-        samples.append(model.module.generate_fast(length, temperature=temp))
+        samples.append(model.generate_fast(length, temperature=temp))
     samples = np.stack(samples, axis=0)
     return samples

@@ -83,6 +83,6 @@ trainer = WavenetTrainer(model=model,
                          ltype=ltype)
 
 print('start training...')
-trainer.train(batch_size=16,
+trainer.train(batch_size=64,
               epochs=1,
               continue_training_at_step=0)
