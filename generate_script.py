@@ -27,15 +27,20 @@ start_data = torch.max(start_data, 0)[1]
 def prog_callback(step, total_steps):
     print(str(100 * step // total_steps) + "% generated")
 
-
 generated = model.generate(
     num_samples=100000,
     first_samples=start_data,
-    progress_callback=prog_callback,
-    progress_interval=1000,
     temperature=1.0,
-    regularize=0.0,
 )
+
+# generated = model.generate_fast(
+#     num_samples=100000,
+#     first_samples=start_data,
+#     progress_callback=prog_callback,
+#     progress_interval=1000,
+#     temperature=1.0,
+#     regularize=0.0,
+# )
 
 print(generated)
 # librosa.output.write_wav('latest_generated_clip.wav', generated, sr=16000)
