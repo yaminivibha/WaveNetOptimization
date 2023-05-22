@@ -1,6 +1,7 @@
 # Optimizing Wavenet Inference using Caching and Quantization
-Project slides available here
-IEEE report available here
+Project slides available (here)[https://github.com/yaminivibha/WaveNetOptimization/blob/main/_Slides.pdf]
+
+IEEE report available (here)[https://github.com/yaminivibha/WaveNetOptimization/blob/main/_Paper.pdf]
 
 #### Yamini Ananth yva2002, Stan Liao
 
